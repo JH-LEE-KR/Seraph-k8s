@@ -1,0 +1,93 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags %}  <script>alert("{{ message }}")</script> {% endif %}
+    {% endfor %}
+{% endif %}
+
+<span class="login100-form-title p-b-43">
+    Profile
+</span>
+
+<div class="wrap-profile">
+    {% if user %}
+        <div class="wrap-input100" >
+            <input class="input100 has-val" type="text" name="etc" disabled value={{id}}>
+            <span class="focus-input100"></span>
+            <span class="label-input100">Your USERNAME</span>
+        </div>
+
+        <div class="wrap-input100">
+            <input class="input100 has-val" type="text" name="etc" disabled value={{clsuter_masterip}}>
+            <span class="focus-input100"></span>
+            <span class="label-input100">Cluster Master Node Domain</span>
+        </div>
+
+        <div class="wrap-input100">
+            <input class="input100 has-val" type="text" name="etc" disabled value={{cluster}}>
+            <span class="focus-input100"></span>
+            <span class="label-input100">Assigned Cluster</span>
+        </div>
+    {% endif %}
+</div>
+
+<div class="flex-sb-m w-full p-t-3 p-b-32">
+    <div class="contact100-form-checkbox">
+        <a href="{% url 'accounts:update' %}" class="txt1">
+            Edit information
+        </a>
+    </div>
+
+    <div class="contact100-form-checkbox">
+        <a href="{% url 'accounts:update_pw' %}" class="txt1">
+            Change Password
+        </a>
+    </div>
+
+    <div class="contact100-form-checkbox">
+        <a href="{% url 'accounts:delete' %}" onclick="return confirm('Are you sure you want to delete account?');" class="txt1">
+            Delete Account
+        </a>
+    </div>
+
+    <div class="contact100-form-checkbox">
+        <a href="{% url 'accounts:logout' %}" class="txt1">
+            Logout
+        </a>
+    </div>
+</div>
+<div id="slackform" class="container-slack-form-btn" style="text-align: center;">
+    <button id="slack" type="button" onclick="location.href='//join.slack.com/t/aiserverhq/shared_invite/zt-1hc770pcl-ZNwHtZvWHioJW_TMC~s4NQ'" style="height: 60px; font-size: 25px;">
+        🙏 Slack Invitation Link 🙏
+    </button>
+</div>
+<script type="text/javascript">
+let r = 0xf;
+let g = 0x0;
+let b = 0x0;
+function changeColor() {
+	//text.innerText = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+	slackform.style.background = '#' + r.toString(16) + g.toString(16) + b.toString(16);
+	slack.style.color = '#' + b.toString(16) + r.toString(16) + g.toString(16);
+
+	if(r == 0xf && g < 0xf && b == 0x0) {				// red -> yellow
+		g += 0x1;
+	} else if(r > 0x0 && g == 0xf && b == 0x0) {		// yellow -> green
+		r -= 0x1;
+	} else if(r == 0x0 && g == 0xf && b < 0xf) {		// green -> cyan
+		b += 0x1;
+	} else if(r == 0x0 && g > 0x0 && b == 0xf) {		// cyan -> cyan
+		g -= 0x1;
+	} else if(r < 0xf && g == 0x0 && b == 0xf) {		// blue -> magenta
+		r += 0x1;
+	} else if(r == 0xf && g == 0x0 && b > 0x0 ) {		// magenta -> red
+		b -= 0x1;
+	}
+	}
+
+setInterval(function() {changeColor()}, 16);
+</script>
+{% endblock %}

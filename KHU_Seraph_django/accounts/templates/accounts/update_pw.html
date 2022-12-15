@@ -1,0 +1,125 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<span class="login100-form-title p-b-43">
+    Update Password
+</span>
+<form method="POST" action="{% url 'accounts:update_pw' %}">
+    {% csrf_token %}
+    <div class="wrap-input100 validate-input" data-validate="Password is required">
+        <input id="old_password" class="input100" type="text" name="old_password">
+        <span class="focus-input100"></span>
+        <span class="label-input100">Current Password</span>
+    </div>
+
+    <div class="wrap-input100 validate-input" data-validate="Password is required">
+        <input id="new_password1" class="input100" type="password" name="new_password1">
+        <span class="focus-input100"></span>
+        <span class="label-input100">New Password</span>
+    </div>
+
+    <div class="wrap-input100 validate-input" data-validate="Password is required">
+        <input id="new_password2" class="input100" type="password" name="new_password2">
+        <span class="focus-input100"></span>
+        <span class="label-input100">Password Verification</span>
+    </div>
+
+    <div class="container-login100-form-btn">
+        <button id="update" type="submit" class="login100-form-btn" formmethod="post" style="margin-top: 10px;">
+            Submit
+        </button>
+    </div>
+
+</form>
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags %}  <script>alert("{{ message }}")</script> {% endif %}
+    {% endfor %}
+{% endif %}
+</form>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript">
+
+    // form valid
+    const signUpFormValid = {
+        old_password:false,
+        new_password1:false,
+        new_password2: false,
+    }
+
+    // all valid check and change button disabled false
+    const checkAllValid = function(signUpFormValid) {
+        const keys = Object.keys(signUpFormValid);
+        let valid = true;
+
+        for (let i = 0 ; i < keys.length; i++){
+            const key = keys[i];
+            if(!signUpFormValid[key]) {
+                valid = false;
+                break;
+            }
+        }
+        if (valid) {
+            $('#update').attr('disabled', false);
+        } else {
+            $('#update').attr('disabled', true);
+        }
+    }
+
+    $(document).ready(function () {
+        // old password valid check
+        $('#old_password').keyup(function(e) {
+            const old_password = $('#old_password').val();
+            $('old_password').val(old_password);
+            if(old_password){
+                signUpFormValid.old_password = true;
+                $('#old_passwordConfirmMessage').text("");
+            } else {
+                signUpFormValid.old_password = false;
+                $('#old_passwordConfirmMessage').text("Required");
+                $('#old_passwordConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // password1 valid check
+        $('#new_password1').keyup(function(e) {
+            const new_password1 = $('#new_password1').val();
+            const new_password2 = $('#new_password2').val();
+            $('new_password1').val(new_password1);
+            $('new_password2').val(new_password2);
+            if(new_password1){
+                signUpFormValid.new_password1 = true;
+                $('#new_password1ConfirmMessage').text("");
+            } else {
+                signUpFormValid.new_password1 = false;
+                $('#new_password1ConfirmMessage').text("Required");
+                $('#new_password1ConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // password2 valid check
+        $('#new_password2').keyup(function(e) {
+            const new_password1 = $('#new_password1').val();
+            const new_password2 = $('#new_password2').val();
+            $('new_password1').val(new_password1);
+            $('new_password2').val(new_password2);
+            if(new_password2){
+                if(new_password1 === new_password2) {
+                    signUpFormValid.new_password2 = true;
+                $('#new_password2ConfirmMessage').text("");
+                } else {
+                $('#new_password2ConfirmMessage').text("Verification failed");
+                $('#new_password2ConfirmMessage').css('color', '#cd201f');
+                }
+            } else {
+                signUpFormValid.new_password2 = false;
+                $('#new_password2ConfirmMessage').text("Required");
+                $('#new_password2ConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+    })
+</script>
+{% endblock %}

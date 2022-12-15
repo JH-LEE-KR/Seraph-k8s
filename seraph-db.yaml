@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: db
+spec:
+  ports:
+    - port: 3306
+      protocol: TCP
+  selector:
+    app: db
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pv-claim
+  labels:
+    app: db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    app: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: mariadb
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: mariadb
+            - name: MYSQL_DATABASE
+              value: mariadb
+            - name: MYSQL_USER
+              value: mariadb
+            - name: MYSQL_PASSWORD
+              value: mariadb
+            - name: MYSQL_ROOT_HOST
+              value: "%"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_HOST
+              value: localhost
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: volume-db
+              mountPath: /srv/docker-server/db
+      restartPolicy: Always
+      volumes:
+        - name: volume-db
+          persistentVolumeClaim:
+            claimName: db-pv-claim

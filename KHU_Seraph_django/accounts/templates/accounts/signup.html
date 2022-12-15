@@ -1,0 +1,253 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<span class="login100-form-title p-b-43">
+    Sign up
+</span>
+<form method="POST" action="{% url 'accounts:login' %}">
+    {% csrf_token %}
+    <div style="overflow-x:scroll;overflow-x:hidden;height: 500px;">
+        <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+            <input id="userEmail" class="input100" type="text" name="email" pattern="(^[A-Za-z0-9._%+-]+@khu\.ac\.kr$|^chaoningzhang1990@gmail\.com)" title="학교 이메일 (*@khu.ac.kr)만 가입이 가능합니다.">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Your KHU E-mail (*@khu.ac.kr)<span id="userIdConfirmMessage"></span></span>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate = "Enter your KHU email.">
+            <input id="name" class="input100" type="text" name="name">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Name (한국인은 한국어로 적어주세요)<span id="nameConfirmMessage"></span></span>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate = "Enter your school id number.">
+            <input id="schoolId" class="input100" type="text" name="school_id">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Student ID<span id="schoolIdConfirmMessage"></span></span>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate = "Select your course.">
+            <select id="type" name="type" type="text" onchange="this.className=this.options[this.selectedIndex].className">
+            <option disabled selected value>Course</option>
+            <option value="Undergraduate" class="selectedOption">Undergraduate (not an intern)</option>
+            <option value="Undergraduate Researcher" class="selectedOption">Undergraduate intern</option>
+            <option value="Competition" class="selectedOption">Competition</option>
+            <option value="Master" class="selectedOption">Master Candidate</option>
+            <option value="PhD" class="selectedOption">Ph.D Candidate</option>
+            <option value="Professor" class="selectedOption">Professor</option>
+            <option value="Other" class="selectedOption">Others</option>
+            </select>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate = "Select your major.">
+            <select id="department" name="department" type="text" onchange="this.className=this.options[this.selectedIndex].className">
+                <option disabled selected value>Major</option>
+                <option value="CE" class="selectedOption">Computer Science</option>
+                <option value="SWCON" class="selectedOption">Software Convergence</option>
+                <option value="AI" class="selectedOption">AI</option>
+                <option value="EE" class="selectedOption">Electronics Engineering</option>
+                <option value="BE" class="selectedOption">Biomedical Engineering</option>
+            </select>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate = "Enter your purpose of this account">
+            <input id="purpose" class="input100" type="text" name="purpose">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Purpose (ex: capstone, research, ...)<span id="purposeConfirmMessage"></span></span>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate="Password is required">
+            <input id="password1" class="input100" type="password" name="password1">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Password<span id="password1ConfirmMessage"></span></span>
+        </div>
+
+        <div class="wrap-input100 validate-input" data-validate="Password is required">
+            <input id="password2" class="input100" type="password" name="password2">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Password Verification<span id="password2ConfirmMessage"></span></span>
+        </div>
+    </div>
+
+    <div class="container-login100-form-btn" >
+        <button id="signUp" type="submit" class="login100-form-btn" formmethod="post" style="margin-top: 10px;" disabled>
+            Submit
+        </button>
+    </div>
+
+</form>
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags %}  <script>alert("{{ message }}")</script> {% endif %}
+    {% endfor %}
+{% endif %}
+</form>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript">
+
+    // form valid
+    const signUpFormValid = {
+        userId: false,
+        name : false,
+        schoolId: false,
+        type:false,
+        department: false,
+        purpose: false,
+        password1:false,
+        password2: false,
+    }
+
+    // all valid check and change button disabled false
+    const checkAllValid = function(signUpFormValid) {
+        const keys = Object.keys(signUpFormValid);
+        let valid = true;
+
+        for (let i = 0 ; i < keys.length; i++){
+            const key = keys[i];
+            if(!signUpFormValid[key]) {
+                valid = false;
+                break;
+            }
+        }
+        if (valid) {
+            $('#signUp').attr('disabled', false);
+        } else {
+            $('#signUp').attr('disabled', true);
+        }
+    }
+
+    $(document).ready(function () {
+        // email valid check
+        $('#userEmail').keyup(function(e) {
+            const userId = $('#userEmail').val();
+            $('userId').val(userId);
+            if (/^[A-Za-z0-9._%+-]+@khu\.ac\.kr$/.test(userId) || /^chaoningzhang1990@gmail\.com$/.test(userId)) {
+                $('#userIdConfirmMessage').text("");
+                signUpFormValid.userId = true;
+            } else {
+                $('#userIdConfirmMessage').text("Only possible domain is @khu.ac.kr");
+                $('#userIdConfirmMessage').css('color', '#cd201f');
+                signUpFormValid.userId = false;
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // name valid check
+        $('#name').keyup(function(e) {
+            const name = $('#name').val();
+            $('name').val(name);
+            if(name){
+                signUpFormValid.name = true;
+                $('#nameConfirmMessage').text("");
+            } else {
+                signUpFormValid.name = false;
+                $('#nameConfirmMessage').text("Required");
+                $('#nameConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // schoolId valid check
+        $('#schoolId').keyup(function(e) {
+            const schoolId = $('#schoolId').val();
+            $('schoolId').val(schoolId);
+            // if(schoolId){
+            //     signUpFormValid.schoolId = true;
+            //     $('#schoolIdConfirmMessage').text("");
+            // } else {
+            //     signUpFormValid.schoolId = false;
+            //     $('#schoolIdConfirmMessage').text("Required");
+            //     $('#schoolIdConfirmMessage').css('color', '#cd201f');
+            // }
+            // checkAllValid(signUpFormValid);
+            if ((/^20[0-2]\d{7}$/.test(schoolId)) || (/^0\d{5}$/.test(schoolId))) {
+                $('#schoolIdConfirmMessage').text("");
+                signUpFormValid.schoolId = true;
+            } else {
+                $('#schoolIdConfirmMessage').text("Invalid schoolID type");
+                $('#schoolIdConfirmMessage').css('color', '#cd201f');
+                signUpFormValid.schoolId = false;
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // type valid check
+        $('#type').change(function(e) {
+            const type = $('#type').val();
+            $('type').val(type);
+            if(type){
+                signUpFormValid.type = true;
+            } else {
+                signUpFormValid.type = false;
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // department valid check
+        $('#department').change(function(e) {
+            const department = $('#department').val();
+            $('department').val(department);
+            if(department){
+                signUpFormValid.department = true;
+            } else {
+                signUpFormValid.department = false;
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // purpose valid check
+        $('#purpose').keyup(function(e) {
+            const purpose = $('#purpose').val();
+            $('purpose').val(purpose);
+            if(purpose){
+                signUpFormValid.purpose = true;
+                $('#purposeConfirmMessage').text("");
+            } else {
+                signUpFormValid.purpose = false;
+                $('#purposeConfirmMessage').text("Required");
+                $('#purposeConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // password1 valid check
+        $('#password1').keyup(function(e) {
+            const password1 = $('#password1').val();
+            const password2 = $('#password2').val();
+            $('password1').val(password1);
+            $('password2').val(password2);
+            if(password1){
+                signUpFormValid.password1 = true;
+                $('#password1ConfirmMessage').text("");
+            } else {
+                signUpFormValid.password1 = false;
+                $('#password1ConfirmMessage').text("Required");
+                $('#password1ConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+
+        // password2 valid check
+        $('#password2').keyup(function(e) {
+            const password1 = $('#password1').val();
+            const password2 = $('#password2').val();
+            $('password1').val(password1);
+            $('password2').val(password2);
+            if(password2){
+                if(password1 === password2) {
+                    signUpFormValid.password2 = true;
+                $('#password2ConfirmMessage').text("");
+                } else {
+                $('#password2ConfirmMessage').text("Verification failed");
+                $('#password2ConfirmMessage').css('color', '#cd201f');
+                }
+            } else {
+                signUpFormValid.password2 = false;
+                $('#password2ConfirmMessage').text("Required");
+                $('#password2ConfirmMessage').css('color', '#cd201f');
+            }
+            checkAllValid(signUpFormValid);
+        })
+    })
+</script>
+{% endblock %}

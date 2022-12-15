@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      name: server
+  selector:
+    app: server
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+      tier: server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: server
+        tier: server
+    spec:
+      containers:
+        - name: django
+          image: jaeholeekr/k8s-django
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /srv/docker-server
+              name: volume-django
+          command: ["/bin/bash"]
+          args: ["-c", "python manage.py makemigrations
+              && python manage.py migrate
+              && uwsgi --ini uwsgi.ini"]
+        - name: nginx
+          image: jaeholeekr/k8s-nginx
+          volumeMounts:
+            - mountPath: /srv/docker-server
+              name: volume-django
+          ports:
+            - containerPort: 80
+            
+      volumes:
+        - name: volume-django
+          hostPath:
+            path: /srv/docker-server/KHU_Seraph_django
+        - name: volume-nginx
+          hostPath:
+            path: /srv/docker-server/KHU_Seraph_nginx
